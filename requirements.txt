@@ -14,10 +14,12 @@ django-mathfilters==1.0.0
 django-money==3.0.0
 fonttools==4.37.3
 google-currency==1.0.10
+gunicorn==20.1.0
 html5lib==1.1
 idna==3.4
 Pillow==9.2.0
 psycopg2==2.9.3
+psycopg2-binary==2.9.4
 py-moneyed==2.0
 pycparser==2.21
 pydyf==0.3.0
