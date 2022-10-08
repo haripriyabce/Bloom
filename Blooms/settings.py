@@ -27,9 +27,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['35.78.96.209','localhost','127.0.0.1']
+if not DEBUG:
+    ALLOWED_HOSTS = ['35.78.96.209','localhost','127.0.0.1']
+else:
+    ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -90,22 +93,34 @@ WSGI_APPLICATION = 'Blooms.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-    #   'NAME': os.environ.get('NAME'),
-    #   'USER': os.environ.get('USER'),
-     #   'PASSWORD': os.environ.get('PASSWORD'),
-     #   'HOST': os.environ.get('HOST'),
-     #   'PORT':  os.environ.get('PORT'),
-        'NAME':'myblooms',
-        'USER':'bloomuser',
-        'PASSWORD':'bloompass',
-        'HOST':'localhost',
-        'PORT': '5432',
+if not DEBUG:
+    
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+        #   'NAME': os.environ.get('NAME'),
+        #   'USER': os.environ.get('USER'),
+        #   'PASSWORD': os.environ.get('PASSWORD'),
+        #   'HOST': os.environ.get('HOST'),
+        #   'PORT':  os.environ.get('PORT'),
+            'NAME':'myblooms',
+            'USER':'bloomuser',
+            'PASSWORD':'bloompass',
+            'HOST':'localhost',
+            'PORT': '5432',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',       
+            'NAME':'ne_bloom',
+            'USER':'postgres',
+            'PASSWORD':'password',
+            'HOST':'localhost',
+            'PORT': '5432',
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -164,12 +179,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
-# SESSION_COOKIE_SECURE = True
-# CSRF_COOKIE_SECURE = True
-# SECURE_SSL_REDIRECT = True
-# SECURE_HSTS_SECONDS = 31536000  # 1 year
-# SECURE_HSTS_PRELOAD = True
-# SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+if not DEBUG:
+    
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_SSL_REDIRECT = True
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_PRELOAD = True
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 
 
 # if ENVIRONMENT == 'production':
