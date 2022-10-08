@@ -149,7 +149,7 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
 MEDIA_URL = 'ims/'
-if not DEBUG:
+if DEBUG:
     STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 RAZORPAY_KEY_ID='rzp_test_CLJZAjlkyL5HrW'
 RAZORPAY_KEY_SECRET='QCaYdk2SVhSH9aQPbShWNmtB'
