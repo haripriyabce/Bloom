@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'user_sec',
     'crispy_forms',
     'debug_toolbar',
+    'Blooms'
     
 ]
 
