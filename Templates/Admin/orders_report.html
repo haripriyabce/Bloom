@@ -37,8 +37,8 @@
 
             <form action="" method="post">
               {% csrf_token %}
-              <input class="form-control" type="date" name="from_date" placeholder="Begin Typing To Search Users...">
-              <input class="form-control" type="date" name="to_date" placeholder="Begin Typing To Search Users...">
+              <input class="form-control" type="date" id="from_date" name="from_date" onchange= isFutureDate(this.value)>
+              <input class="form-control" type="date" name="to_date" name="to_date" onchange= isPrevious(this.value) >
               <select name="yearly" id="yearly" onchange="calc_year(this.value)">
                 <option value="">Select Year </option>
 
@@ -282,7 +282,28 @@
   function calc_month(month) {
     //alert(month);
   }
- 
+  function isFutureDate(idate){
+    alert('i'+idate)
+    var today = new Date().getTime(),
+        idate = idate.split("-");    
+    idate = new Date(idate[0], idate[2] - 1, idate[1]).getTime();
+    console.log(idate+'lllllllll');
+    console.log(today+'tooo');
+    console.log((today - idate) < 0);  
+    return (today - idate) < 0 ;
+}
+function isPrevious(idate){
+  
+if(!isFutureDate(idate)){ 
+  var from_date=document.getElementById('from_date').value;
+  from_date=from_date.split("-");
+  from_date=new Date(from_date[0], from_date[2] - 1, from_date[1]).getTime();
+  var idate = idate.split("-");
+  idate = new Date(idate[0], idate[2] - 1, idate[1]).getTime();
+  return (from_date - idate) < 0;
+}
+}
+
 </script>
 <script src="https://unpkg.com/hyperscript.org@0.9.7"></script>
 {% endblock content %}

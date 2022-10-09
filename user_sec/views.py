@@ -27,7 +27,7 @@ def index1(request):
     sec_banner1= Content.objects.get(name='sec_banner1') 
     sec_banner2= Content.objects.get(name='sec_banner2')    
     products1= Product.objects.all()[5:8]   
-    print("z",z) 
+    print("zbbbbbbbbb",z) 
     context = {
         'logo_light':logo_light,
         'slider':slider,
