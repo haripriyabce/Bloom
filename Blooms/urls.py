@@ -17,21 +17,21 @@ from django.contrib import admin
 from django.urls import path,include
 from django.conf.urls.static import static
 from django.conf import settings
-try:
-    urlpatterns = [ 
-        path('', include('user_sec.urls')),           
-        path('admin/', admin.site.urls),
-        path('ad/', include('admin_p.urls')),
-        path('ct/', include('cart.urls')),
-        path('od/', include('order.urls')),
-        path('con/', include('content.urls')),
-        path('pf/', include('user_profile.urls')),
-        
-    ]
-    urlpatterns +=static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+#try:
+urlpatterns = [ 
+    path('', include('user_sec.urls')),           
+    path('admin/', admin.site.urls),
+    path('ad/', include('admin_p.urls')),
+    path('ct/', include('cart.urls')),
+    path('od/', include('order.urls')),
+    path('con/', include('content.urls')),
+    path('pf/', include('user_profile.urls')),
+    
+]
+urlpatterns +=static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-    if settings.DEBUG:
-        urlpatterns +=path('__debug__/', include('debug_toolbar.urls')),
-except Exception: 
-     urlpatterns = [ ]
+if settings.DEBUG:
+    urlpatterns +=path('__debug__/', include('debug_toolbar.urls')),
+#except Exception: 
+#     urlpatterns = [ ]
            
