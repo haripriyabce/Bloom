@@ -27,7 +27,15 @@ urlpatterns = [
     path('offer',views.offer,name='offer'),
     path('add_offer',views.add_offer,name='add_offer'),
     path('update_offer/<int:id>', views.update_offer,name='update_offer'),
+    path('delet_offer/<int:id>', views.delet_offer,name='delet_offer'),
     
+    
+    
+    path('cat_offer',views.cat_offer,name='cat_offer'),
+    path('add_cat_offer',views.add_cat_offer,name='add_cat_offer'),
+    path('update_cat_offer/<int:id>', views.update_cat_offer,name='update_cat_offer'),
+    path('cat_offer_delete/<int:id>', views.cat_offer_delete,name='cat_offer_delete'),
+   
     
     path('coupon_list',views.coupon_list,name='coupon_list'),
     path('coupon_disable/<int:id>',views.coupon_disable,name='coupon_disable'),

@@ -1,4 +1,5 @@
 from django.db import models
+from category.models import Category
 from product.models import Product
 from admin_p.models import Users,Shipping_Address
 class Payment(models.Model):
@@ -96,5 +97,11 @@ class Product_off(models.Model):
     discount = models.IntegerField()
     def __str__(self):
         return str(self.product)
+    
+class Category_off(models.Model):    
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)     
+    discount = models.IntegerField()
+    def __str__(self):
+        return str(self.category)
     
 

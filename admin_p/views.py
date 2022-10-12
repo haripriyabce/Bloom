@@ -13,12 +13,13 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.template import loader
 from admin_p.models import Users,Shipping_Address
-from order.models import Order,Order_Product, Payment,Product_off
+from order.models import Order,Order_Product, Payment,Product_off,Category_off
 from category.models import Category,Subcategory
 from product.models import Product,Product_cate,Offer
 from product.forms import ProductForm
 from django.core.paginator import Paginator
 import datetime
+from django.db.models import Q
 from django.template.loader import render_to_string
 from cart.models import Coupon
 import xlwt
@@ -340,21 +341,35 @@ def orders(request):
 def rep_orders(request): 
     orders=Order.objects.select_related('address').select_related('payment').order_by('-id')   
     if request.method=='POST':        
-        from_date = request.POST.get('from_date')
-        to_date = request.POST.get('to_date')  
+        search_name = request.POST.get('search')
+        # from_date = request.POST.get('from_date')
+        # to_date = request.POST.get('to_date') 
+        # from_date = datetime.datetime.strptime(from_date, '%Y-%m-%d')
+        # to_date = datetime.datetime.strptime(to_date, '%Y-%m-%d') 
+        # print("sxsfxf",request.POST.items())
         year = request.POST.get('yearly')
         month = request.POST.get('monthly')  
-        if from_date !='' and to_date!='':
-            from_date = datetime.datetime.strptime(from_date, '%Y-%m-%d')
-            to_date = datetime.datetime.strptime(to_date, '%Y-%m-%d')
-            orders = Order.objects.filter(created_at__date__range=[from_date, to_date]) 
+        # if from_date !=None and to_date!=None and search_name !='':                      
+        #     searchwith=Q(Q(payment__payment_method__contains=search_name)|Q(address__email__contains=search_name))
+        #     #myuser =User.objects.filter(searchwith).values()       
+       
+        #     orders = Order.objects.filter(created_at__date__range=[from_date, to_date]).filter(searchwith)
+        if search_name !='':
+            searchwith=Q(Q(payment__payment_method__icontains=search_name)|Q(address__email__icontains=search_name))
+            #myuser =User.objects.filter(searchwith).values()       
+       
+            orders = Order.objects.filter(searchwith)
+        # if from_date !='' and to_date!='':            
+        #     orders = Order.objects.filter(created_at__date__range=[from_date, to_date]) 
         if  year !='': 
             orders = Order.objects.filter(created_at__year__gte=year,created_at__year__lte=year) 
         if  month !='':      
             datetime_object = datetime.datetime.strptime(month, "%B")
             month = datetime_object.month
-            orders = Order.objects.filter(created_at__month__gte=month,created_at__month__lte=month) 
-            
+            orders = Order.objects.filter(created_at__month__gte=month,created_at__month__lte=month)
+    agg_orders=orders.aggregate(Total=Sum('order_total'),count=Count('id'))  
+    print('agg_ordersffffff',agg_orders,'agg_ordersggggg') 
+    print('aag',agg_orders['Total'])
     #orders=Order.objects.select_related('address').select_related('payment').order_by('-id')    
     paginator = Paginator(orders, 10) 
     page_number = request.GET.get('page')
@@ -362,7 +377,7 @@ def rep_orders(request):
     mon=list(calendar.month_name)
     e=range(2011,2023)
     
-    return render( request,'Admin/orders_report.html',{'page_obj':page_obj,'e':e,'mon':mon})       
+    return render( request,'Admin/orders_report.html',{'page_obj':page_obj,'e':e,'mon':mon,'agg_orders':agg_orders})       
 def rep_orders_yearly(request): 
     orders=Order.objects.select_related('address').select_related('payment').order_by('-id')   
     if request.method=='POST':        
@@ -402,6 +417,56 @@ def ship(request,id):
     myorder.status = 'Shipped'
     myorder.save()
     return HttpResponse("Shipped")
+def cat_offer(request):     
+    try: 
+       
+        offer=Category_off.objects.select_related('category').order_by('-id')
+    except offer.DoesNotExist:
+        offer=None    
+    paginator = Paginator(offer, 10) 
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number) 
+    return render( request,'Admin/cat_offer_list.html',{'page_obj':page_obj}) 
+def add_cat_offer(request):  
+    if request.method == 'POST':
+        name = request.POST['name']         
+        discount = request.POST['discount']
+        if name=='' :
+            messages.info(request,'Please fill valid entries') 
+            return redirect(add_cat_offer) 
+        else:   
+            
+            if Category_off.objects.filter(category_id=name).exists():                
+                messages.info(request,'Offer Already exists for this category')
+                return redirect(add_cat_offer)            
+            else:   
+                cate= Category_off.objects.create(category_id=name,discount=discount)
+                cate.save()
+                print('Category Offer created')
+                return redirect(cat_offer)             
+    else:
+        category=Category.objects.all().order_by('category_name')
+        return render(request,'Admin/Add_cat_offer.html',{'cate':category})  
+def update_cat_offer(request,id):    
+    if request.method == 'POST':        
+        name = request.POST['name']
+        discount = request.POST['discount']        
+        if name=='' or discount=='':
+            messages.info(request,'Please fill valid entries')            
+            return redirect(update_cat_offer(id))
+        else:
+            cat = Category_off.objects.get(id=id)
+            cat.category_id = name
+            cat.discount = discount
+            cat.save()
+            return redirect(cat_offer)          
+    mycat = Category_off.objects.get(id=id)     
+    category=Category.objects.all().order_by('category_name')
+    return render(request,'Admin/up_cat_offer.html',{'cate':category,'mycat': mycat,}) 
+def cat_offer_delete(request,id):   
+    cat_off = Category_off.objects.get(id=id)
+    cat_off.delete()
+    return redirect('cat_offer')
 
 def offer(request):
     offer=Product_off.objects.select_related('product').order_by('-id') 
@@ -430,24 +495,26 @@ def add_offer(request):
         product=Product.objects.all().order_by('product_name')
         return render(request,'Admin/Add_offer.html',{'pro':product})  
 
-def update_offer(request,id): 
-    if 'admin_username' in request.session:
-        if request.method == 'POST':        
-            name = request.POST['name']
-            description = request.POST['description']        
-            if name=='' or description=='':
-                messages.info(request,'Please fill valid entries')            
-                return redirect(update_cat(id))
-            else:
-                cat = Category.objects.get(id=id)
-                cat.category_name = name
-                cat.description = description
-                cat.save()
-                return redirect(offer)          
-        mycat = Category.objects.get(id=id) 
-        template = loader.get_template('Admin/up_category.html')
-        context = { 'mycat': mycat, }
-        return HttpResponse(template.render(context, request))
+def update_offer(request,id):     
+    if request.method == 'POST':        
+        name = request.POST['name']
+        discount = request.POST['discount']        
+        if name=='' or discount=='':
+            messages.info(request,'Please fill valid entries')            
+            return redirect(update_offer(id))
+        else:
+            cat = Product_off.objects.get(id=id)
+            cat.product_id = name
+            cat.discount = discount
+            cat.save()
+            return redirect(offer)          
+    pro_off = Product_off.objects.get(id=id) 
+    product=Product.objects.all().order_by('product_name')        
+    return render(request,'Admin/up_offer.html',{'pro_off':pro_off,'pro':product})
+def delet_offer(request,id):   
+    off = Product_off.objects.get(id=id)
+    off.delete()
+    return redirect('offer')  
 def deactivate_offer(request,id):    
     #cate = Category.objects.get(id=id)
     mycat =Category.objects.get(id__exact=id)
