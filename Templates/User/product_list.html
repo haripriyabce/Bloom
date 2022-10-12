@@ -38,7 +38,7 @@
 											<!--<span class="mr-2 price-dc">{{x.product.price}}</span>-->
 											<span class="price-sale">₹ &nbsp{{x.product.price}}</span></p>
 									  </div>
-									  <div class="rating">
+									  <!-- <div class="rating">
 										  <p class="text-right">
 											  <a href="#"><span class="ion-ios-star-outline"></span></a>
 											  <a href="#"><span class="ion-ios-star-outline"></span></a>
@@ -46,7 +46,7 @@
 											  <a href="#"><span class="ion-ios-star-outline"></span></a>
 											  <a href="#"><span class="ion-ios-star-outline"></span></a>
 										  </p>
-									  </div>
+									  </div> -->
 								  </div>
 
 								  <!--<span style='font-size:100px;'>&#9829;</span>#BLACK HEART-->
@@ -80,6 +80,23 @@
 			  </div>
 
 			  <div class="col-md-4 col-lg-2 sidebar">
+				<div class="sidebar-box-2">
+					
+					<form action="" method="post">
+						{% csrf_token %}
+						<div class="input-group">
+						<input type="search" class="form-control"placeholder="Search" name="product_search">
+						<input type="submit"  class="btn btn-outline-primary" name="sub" value="SEARCH">
+						</div>
+					</form>
+				</div>
+				
+				<div class="sidebar-box-2">
+					<h2 class="heading mb-4"><a href="{% url 'us_products' %}">All Categories</a></h2>
+					 
+					
+				</div>
+				
 				{% for x in categories %}
 				  <div class="sidebar-box-2">
 					  <h2 class="heading mb-4"><a href="{% url 'us_products' x.id %}">{{ x.category_name }}</a></h2>
@@ -97,19 +114,20 @@
 				{% endfor %}
 
 				<div class="sidebar-box-2">
-					<h2 class="heading mb-4"><a href="#">Sort</a></h2>
+				{% comment %} 	<h2 class="heading mb-4"><a href="#">Sort</a></h2>
 					<ul>
 					 
-						{% comment %} <li><a href="{% url 'us_products' x.id %}{{ y.id }}">Featured</a></li>
+						<li><a href="{% url 'us_products' x.id %}{{ y.id }}">Featured</a></li>
 						<li><a href="{% url 'us_products' x.id %}{{ y.id }}">Best selling</a></li>
 						<li><a href="{% url 'us_products' x.id %}{{ y.id }}">Alphabetically, A-Z</a></li>
 						<li><a href="{% url 'us_products' x.id %}{{ y.id }}">Alphabetically, Z-A</a></li>
 						<li><a href="{% url 'us_products' x.id %}{{ y.id }}">Price, low to high</a></li>
 						<li><a href="{% url 'us_products' x.id %}{{ y.id }}">Price, high to low</a></li>
 						<li><a href="{% url 'us_products' x.id %}{{ y.id }}">Date, old to new</a></li>
-						<li><a href="{% url 'us_products' x.id %}{{ y.id }}">Date, new to old</a></li> {% endcomment %}
+						<li><a href="{% url 'us_products' x.id %}{{ y.id }}">Date, new to old</a></li> 
 		
 					</ul>
+					{% endcomment %}
 				</div>
 
 

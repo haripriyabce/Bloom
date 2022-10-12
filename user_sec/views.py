@@ -37,7 +37,26 @@ def index1(request):
         'products':products,
         'z':z,
         }       
-    return render(request,'User/index.html',context)      
+    return render(request,'User/index.html',context)  
+def login1(request):    
+    if request.method == 'POST':
+        email = request.POST['email']
+        password = request.POST['password']        
+        if Users.objects.filter(username=email, password=password).exists():
+            user = Users.objects.get(username=email, password=password)            
+            if user is not None:
+                auth.login(request,user)   
+                request.session.flush()
+                request.session['username'] = email
+                request.session['user_id'] = user.id                 
+                return redirect(index1)                
+        else :            
+            messages.error(request,'invalid credentials')            
+            return redirect(login)   
+    context = { 
+                           'logo_light':logo_light,
+                    }             
+    return render(request,'User/login_without_otp.html',context)    
 def login(request):    
     if request.method == 'POST':
         email = request.POST['email']
@@ -45,11 +64,12 @@ def login(request):
         if Users.objects.filter(username=email, password=password).exists():
             user = Users.objects.get(username=email, password=password)            
             if user is not None:
-                auth.login(request,user)                    
-                global otp
+                auth.login(request,user) 
+                                  
+                
                 otp = str(random.randint(1000,9999))
                 print(otp) 
-                
+                request.session['otp'] =otp
                 # account_sid = "ACfb89df3b244d24d509cfeb86bad42469"
                 # auth_token = "b0269ac8f0e13f4633f45b502e0a2fa0"
                 # client = Client(account_sid, auth_token)
@@ -82,7 +102,7 @@ def login_otp(request):
         otpvalue = request.POST['otp']
         user_name = request.POST['usern']
         if len(otpvalue)>0:
-            if otpvalue == otp:
+            if otpvalue == request.session['otp']:
                 print(user_name)
                 user = Users.objects.get(id=user_name)           
                 #auth.login(request,user)
@@ -104,6 +124,43 @@ def login_otp(request):
                            'logo_light':logo_light,
                     }   
     return render(request,'User/login_otp.html',context)
+
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)  
+def register1(request):
+    if 'username' in request.session:
+        return render(request,'home.html')        
+    if request.method == 'POST':
+        first_name = request.POST['first_name']
+        last_name = request.POST['last_name']   
+        phone_number = request.POST['Phone_number']     
+        password1 = request.POST['password1']
+        password2 = request.POST['password2']
+        email = request.POST['email']        
+        if first_name=='' or last_name=='' or password1==''or phone_number=='':
+            messages.info(request,'Please fill valid entries') 
+            return redirect(register) 
+        else:            
+            if password1==password2:
+                if Users.objects.filter(email=email).exists():
+                    messages.info(request,'Email Taken')
+                    return redirect(register)
+                elif Users.objects.filter(Phone_number=phone_number).exists():
+                    messages.info(request,'Phone number already exist')
+                    return redirect(register)
+                else:  
+                    user = Users.objects.create(first_name=first_name,last_name=last_name,email=email,username=email,password=password1)
+                    user.save()                    
+                    return redirect(login1)                    
+            else:
+                messages.info(request,'password not matching..')    
+                return redirect(register) 
+              
+    else:
+        context = {
+                        'logo_light':logo_light,
+         }
+        
+        return render(request,'User/register.html',context)
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)  
 def register(request):
     if 'username' in request.session:
@@ -129,10 +186,10 @@ def register(request):
                 else:  
                     user = Users.objects.create(first_name=first_name,last_name=last_name,email=email,username=email,password=password1)
                     user.save()
-                    user_name = user
-                    global otps                    
+                    user_name = user                   
                     otps = str(random.randint(1000,9999))
-                    print(otps)           
+                    print(otps)     
+                    request.session['otps']=  otps
                     # account_sid = "ACfb89df3b244d24d509cfeb86bad42469"
                     # auth_token = "b0269ac8f0e13f4633f45b502e0a2fa0"
                     # client = Client(account_sid, auth_token)
@@ -166,7 +223,7 @@ def otp_verification(request,Phone_number):
     if request.method=='POST':              
         otp3 =  request.POST['first']+ request.POST['second']+request.POST['third']+request.POST['fourth']
         print(otp3)   
-        if otp3 == otps :
+        if otp3 ==  request.session['otps']:
             if Users.objects.filter( id = user_name).exists():                
                 use = Users.objects.get(id = user_name)
                 email = use.email
@@ -215,10 +272,9 @@ def products(request,cat=None,sub=None):
         products = Product_cate.objects.select_related('product').filter(catid_id = cat).distinct('product_id')       
     else:
         products= Product_cate.objects.select_related('product').all().distinct('product_id')           
-    # if request.method == 'POST':
-    #     search = request.POST["product_search"] 
-    #     products = Product.objects.filter(product_name__icontains = search)
-    #     return render(request,'Admin/product_list.html',{'products': products })
+    if request.method == 'POST':
+        search = request.POST["product_search"] 
+        products = products.filter(product__product_name__icontains = search)        
     categories =Category.objects.all()
     subcategories=Subcategory.objects.all()         
     pro_off=Product_off.objects.all()
