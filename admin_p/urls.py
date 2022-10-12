@@ -4,14 +4,17 @@ urlpatterns = [
     path('user',views.user,name='user'),   
     path('update_cat/<int:id>', views.update_cat,name='update_cat'),
     path('update_subcat/<int:id>', views.update_subcat,name='update_subcat'),
-    path('product_edit/<int:id>', views.product_edit,name='product_edit'),
     #path('update/update_user2/<int:id>', views.update_user2),    
     path('deactivate/<int:id>', views.deactivate_cat),
     path('block_unblock/<int:id>', views.block_unblock,name='block_unblock'),    
     path('category',views.category,name='category'),
     path('subcategory',views.subcategory,name='subcategory'),
+    
+    path('products_stock',views.products_stock,name='products_stock'),
+    path('product_stk_edit', views.product_stk_edit,name='product_stk_edit'),
     path('products',views.products,name='products'),
     path('add_products',views.add_products,name='add_products'),
+    path('product_edit/<int:id>', views.product_edit,name='product_edit'),
     
     path('profile',views.profile,name='profile'),
     path('orders',views.orders,name='orders'),

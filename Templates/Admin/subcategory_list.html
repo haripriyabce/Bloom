@@ -28,12 +28,8 @@
                   <th>
                    Sl.No
                   </th>
-                
-
                   <th>Name</th>
-                  <th>ID</th>
-                  <th>Description</th>
-                  
+                  <th>Category</th>                  
                   <th>Action</th>
                 </tr>
               </thead>
@@ -46,20 +42,18 @@
                       {{ forloop.counter }}
                     </div>
                   </td>
-                 
-
-                  <td>
+                                    <td>
                     <p class="mb-0 text-muted">{{x.subcategory_name}}</p>
                     <!--<small class="mb-0 text-muted">Ap #331-7123 Lobortis Avenue</small>-->
                   </td>
                   <td>
                     <p class="mb-0 text-muted">{{x.category.category_name}}</p>
                   </td>
-                  <td>
+                 <!--  <td>
                     <p class="mb-0 text-muted"><a href="#" class="text-muted">{{x.description}}</a></p>
                     <small class="mb-0 text-muted"></small>
                   </td>
-                 <!--   <td>
+                   <td>
                     
                 
                   <p class="mb-0 text-muted"> <button hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'  _="on click call Swal.fire({title: 'Confirm', text:'Do you want to activate?'})if result.isConfirmed trigger confirmed" hx-get="deactivate_sub/{{ x.id }}" class="dropdown-item" hx-trigger="click"

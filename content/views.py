@@ -3,11 +3,14 @@ from django.shortcuts import render,redirect
 from django.contrib import messages
 from django.http import HttpResponse
 from .models import Content
+from django.db.models import Q
 from django.core.paginator import Paginator
 # Create your views here.
 def content(request):
     contents=Content.objects.all()    
-    
+    if request.method == 'POST':        
+        search = request.POST["search"] 
+        contents = Content.objects.filter(name__icontains = search)     
     paginator = Paginator(contents, 3) # Show 25 contacts per page.
 
     page_number = request.GET.get('page')

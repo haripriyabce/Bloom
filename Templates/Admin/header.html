@@ -29,7 +29,8 @@
           <i class="fe fe-menu navbar-toggler-icon"></i>
         </button>
         <form class="form-inline mr-auto searchform text-muted" action="" method="post">
-          <input class="form-control mr-sm-2 bg-transparent border-0 pl-4 text-muted" type="search" placeholder="Type something..." aria-label="Search">
+          {% csrf_token %}
+          <input class="form-control mr-sm-2 bg-transparent border-0 pl-4 text-muted" name="search" type="search" placeholder="Type something..." aria-label="Search">
         </form>
         <ul class="nav">
           <li class="nav-item">
@@ -162,6 +163,13 @@
               <a class="nav-link" href="{% url 'products' %}">
                 <i class="fe fe-box fe-16"></i>
                 <span class="ml-3 item-text">Product</span>
+               
+              </a>
+            </li>
+            <li class="nav-item w-100">
+              <a class="nav-link" href="{% url 'products_stock' %}">
+                <i class="fe fe-box fe-16"></i>
+                <span class="ml-3 item-text">Stock</span>
                
               </a>
             </li>

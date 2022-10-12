@@ -313,7 +313,7 @@ def paypal_success(request):
         coup_discount=0       
     order_total = round(total-coup_discount)
     payment_method='PAYPAL'
-    ship=Shipping_Address.objects.get(id=addid)                      
+    ship=Shipping_Address.objects.get(id=request.session['addid'])                      
     pay = Payment.objects.create(payment_method=payment_method,amount_paid=order_total,status="Completed")
     pay.save()
     order=Order.objects.create(payment_id=int(pay.id),address=ship,user=uss, order_total = order_total)

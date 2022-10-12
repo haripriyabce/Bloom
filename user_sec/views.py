@@ -12,6 +12,7 @@ from category.models import Category,Subcategory
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate
 from django.contrib import messages,auth
+from django.core.paginator import Paginator
 # Create your views here.
 logo_light= Content.objects.get(name='logo_light')
 def index1(request):
@@ -274,12 +275,23 @@ def products(request,cat=None,sub=None):
         products= Product_cate.objects.select_related('product').all().distinct('product_id')           
     if request.method == 'POST':
         search = request.POST["product_search"] 
-        products = products.filter(product__product_name__icontains = search)        
+        products = products.filter(product__product_name__icontains = search)  
+   
+    page = request.GET.get('page', 1)
+
+    paginator = Paginator(products, 2)
+    
+    try:
+        prods = paginator.page(page)
+    except PageNotAnInteger:
+        prods = paginator.page(1)
+    except EmptyPage:
+        prods = paginator.page(paginator.num_pages)      
     categories =Category.objects.all()
     subcategories=Subcategory.objects.all()         
     pro_off=Product_off.objects.all()
     print(pro_off)
-    return render( request,'User/product_list.html',{'products':products,'z':z,'logo_light':logo_light,'subcategories':subcategories,'categories':categories,'pro_off':pro_off})
+    return render( request,'User/product_list.html',{'products':products,'z':z,'logo_light':logo_light,'subcategories':subcategories,'categories':categories,'prods':prods,'pro_off':pro_off})
 
 def logout(request):
     request.session.flush()    

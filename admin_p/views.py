@@ -78,7 +78,7 @@ def logout(request):
 def user(request):
     users= Users.objects.all().order_by('-id') 
     if request.method == 'POST':        
-        search = request.POST["user_search"] 
+        search = request.POST["search"] 
         users = Users.objects.filter(first_name__icontains = search)    
     paginator = Paginator(users, 10) 
     page_number = request.GET.get('page')
@@ -96,6 +96,9 @@ def block_unblock(request,id):
         return HttpResponse("User Unblocked") 
 def category(request):
     categories=Category.objects.all().order_by('-id') 
+    if request.method == 'POST':        
+        search = request.POST["search"] 
+        categories = Category.objects.filter(category_name__icontains = search)   
     paginator = Paginator(categories, 10) 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number) 
@@ -153,7 +156,11 @@ def deactivate_cat(request,id):
 
 def subcategory(request):
     subcategories=Subcategory.objects.select_related('category').all().order_by('-id')
-    
+    if request.method == 'POST':        
+        search = request.POST["search"] 
+        searchwith=Q(Q(subcategory_name__icontains = search)|Q(category__category_name__icontains=search))
+       
+        subcategories = Subcategory.objects.filter(searchwith)
     paginator = Paginator(subcategories, 10) 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number) 
@@ -247,7 +254,7 @@ def add_products(request):
     context={'subcategories':subcategories,'categories':categories}
     template = loader.get_template('Admin/add_product.html')
     return HttpResponse(template.render(context, request))
-      
+   
 def product_edit(request,id):
     product = Product.objects.get(id=id)
     if request.method == 'POST':
@@ -293,13 +300,30 @@ def product_edit(request,id):
         categories =Category.objects.all()
         subcategories=Subcategory.objects.all() 
         return render (request,'Admin/up_product.html',{'subcategories':subcategories,'categories':categories,'product':product})
-    
-def products(request):
+def products_stock(request):
     products= Product.objects.all().order_by('-id')
     if request.method == 'POST':
         search = request.POST["product_search"] 
-        products = Product.objects.filter(product_name__icontains = search).order_by('-id')
-        
+        products = Product.objects.filter(product_name__icontains = search).order_by('-id')           
+    paginator = Paginator(products, 10) 
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)    
+    return render( request,'Admin/product_stock.html',{'page_obj':page_obj})   
+def product_stk_edit(request):
+    if request.method == 'POST':
+        stock = request.POST['stock']  
+        id = request.POST['proid']     
+        pro = Product.objects.get(id=id) 
+        if len(stock)>0:
+            pro.stock=stock 
+        pro.save()           
+        messages.success(request,'Product Stock Updated')
+        return redirect('products_stock')  
+def products(request):
+    products= Product.objects.all().order_by('-id')
+    if request.method == 'POST':
+        search = request.POST["search"] 
+        products = Product.objects.filter(product_name__icontains = search).order_by('-id')        
     paginator = Paginator(products, 10) 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)    
@@ -333,7 +357,12 @@ def rep_products(request):
 def profile(request):
     return render(request,'Admin/profile.html')
 def orders(request):
-    orders=Order.objects.select_related('address').select_related('payment').order_by('-id')    
+    orders=Order.objects.select_related('address').select_related('payment').order_by('-id') 
+    if request.method == 'POST':        
+        search = request.POST["search"] 
+        searchwith=Q(Q(address__first_name__icontains=search)|Q(address__email__icontains=search)|Q(address__last_name__icontains=search)|Q(payment__payment_method__icontains = search)|Q(status__icontains = search))
+        orders = Order.objects.select_related('address').select_related('payment').filter(searchwith).order_by('-id') 
+           
     paginator = Paginator(orders, 10) 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -341,7 +370,7 @@ def orders(request):
 def rep_orders(request): 
     orders=Order.objects.select_related('address').select_related('payment').order_by('-id')   
     if request.method=='POST':        
-        search_name = request.POST.get('search')
+        search = request.POST.get('search')
         # from_date = request.POST.get('from_date')
         # to_date = request.POST.get('to_date') 
         # from_date = datetime.datetime.strptime(from_date, '%Y-%m-%d')
@@ -354,11 +383,10 @@ def rep_orders(request):
         #     #myuser =User.objects.filter(searchwith).values()       
        
         #     orders = Order.objects.filter(created_at__date__range=[from_date, to_date]).filter(searchwith)
-        if search_name !='':
-            searchwith=Q(Q(payment__payment_method__icontains=search_name)|Q(address__email__icontains=search_name))
-            #myuser =User.objects.filter(searchwith).values()       
+        if search !='':
+            searchwith=Q(Q(address__first_name__icontains=search)|Q(address__email__icontains=search)|Q(address__last_name__icontains=search)|Q(payment__payment_method__icontains = search))
        
-            orders = Order.objects.filter(searchwith)
+            orders = orders.filter(searchwith)
         # if from_date !='' and to_date!='':            
         #     orders = Order.objects.filter(created_at__date__range=[from_date, to_date]) 
         if  year !='': 
@@ -418,11 +446,14 @@ def ship(request,id):
     myorder.save()
     return HttpResponse("Shipped")
 def cat_offer(request):     
-    try: 
-       
+    try:        
         offer=Category_off.objects.select_related('category').order_by('-id')
     except offer.DoesNotExist:
         offer=None    
+    if request.method == 'POST':        
+        search = request.POST["search"] 
+        offer = Category_off.objects.select_related('category').filter(category__category_name__icontains=search).order_by('-id') 
+     
     paginator = Paginator(offer, 10) 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number) 
@@ -470,6 +501,10 @@ def cat_offer_delete(request,id):
 
 def offer(request):
     offer=Product_off.objects.select_related('product').order_by('-id') 
+    if request.method == 'POST':                
+        search = request.POST["search"] 
+        offer = Product_off.objects.select_related('category').filter(product__product_name__icontains=search).order_by('-id') 
+     
     paginator = Paginator(offer, 10) 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number) 
