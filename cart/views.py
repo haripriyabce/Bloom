@@ -288,7 +288,7 @@ def paypal_success(request):
     quantity = 0   
     coup_discount=0        
     print('in')  
-    uss = Users.objects.get(id=iddd) 
+    uss = Users.objects.get(id=request.session['user_id']) 
     carts = Cart.objects.get(user = uss)          
     cart_items = cartItem.objects.select_related('product').filter(cart = carts)            
     tot_di=0     
