@@ -107,8 +107,7 @@ def invoice(request,id):
 def track_order(request,id):
     order=Order.objects.select_related('address').select_related('payment').get(id=id)
     total = order.order_total
-    order_product=Order_Product.objects.select_related('product').filter(order_id=id)      
-    
+    order_product=Order_Product.objects.select_related('product').filter(order_id=id)   
         
     context ={'order':order,'order_product':order_product,'total':total,'logo_light':logo_light}
     return render(request,'Order/track_order.html',context) 

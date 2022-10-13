@@ -371,24 +371,28 @@ def rep_orders(request):
     orders=Order.objects.select_related('address').select_related('payment').order_by('-id')   
     if request.method=='POST':        
         search = request.POST.get('search')
-        # from_date = request.POST.get('from_date')
-        # to_date = request.POST.get('to_date') 
-        # from_date = datetime.datetime.strptime(from_date, '%Y-%m-%d')
-        # to_date = datetime.datetime.strptime(to_date, '%Y-%m-%d') 
+        from_date = request.POST.get('from_date')
+        to_date = request.POST.get('to_date') 
+        print('from_date',from_date)
+        print('to_date',to_date)
+        from_date = datetime.datetime.strptime(from_date, '%Y-%m-%d')
+        to_date = datetime.datetime.strptime(to_date, '%Y-%m-%d') 
+        print('from_date',from_date)
+        print('to_date',to_date)
         # print("sxsfxf",request.POST.items())
         year = request.POST.get('yearly')
         month = request.POST.get('monthly')  
-        # if from_date !=None and to_date!=None and search_name !='':                      
-        #     searchwith=Q(Q(payment__payment_method__contains=search_name)|Q(address__email__contains=search_name))
-        #     #myuser =User.objects.filter(searchwith).values()       
+        if from_date !=None and to_date!=None and search !='':
+            searchwith=Q(Q(address__first_name__icontains=search)|Q(address__email__icontains=search)|Q(address__last_name__icontains=search)|Q(payment__payment_method__icontains = search))
+            #myuser =User.objects.filter(searchwith).values()       
        
-        #     orders = Order.objects.filter(created_at__date__range=[from_date, to_date]).filter(searchwith)
+            orders = orders.filter(created_at__date__range=[from_date, to_date]).filter(searchwith)
         if search !='':
             searchwith=Q(Q(address__first_name__icontains=search)|Q(address__email__icontains=search)|Q(address__last_name__icontains=search)|Q(payment__payment_method__icontains = search))
        
             orders = orders.filter(searchwith)
-        # if from_date !='' and to_date!='':            
-        #     orders = Order.objects.filter(created_at__date__range=[from_date, to_date]) 
+        if from_date !='' and to_date!='':            
+            orders = Order.objects.filter(created_at__date__range=[from_date, to_date]) 
         if  year !='': 
             orders = Order.objects.filter(created_at__year__gte=year,created_at__year__lte=year) 
         if  month !='':      
@@ -631,7 +635,7 @@ def export_pdf(request):
     salesreport = Order.objects.select_related('address').select_related('payment').order_by('-id')
     total= salesreport.aggregate(Sum('order_total'))
 
-    html_string = render_to_string('admin/pdf_output.html',{ 'salesreport':salesreport, 'total': total})
+    html_string = render_to_string('Admin/pdf_output.html',{ 'salesreport':salesreport, 'total': total})
 
     html=HTML(string=html_string)
 
@@ -650,7 +654,7 @@ def coupon_list(request):
     context={ 
         'coupons':coupons
     }
-    return render(request,'admin/coupon_list.html',context)
+    return render(request,'Admin/coupon_list.html',context)
 
 def coupon_disable(request,id):
     
@@ -689,7 +693,7 @@ def coupon_edit(request,id):
             'coupon_id' : coupon_id,
             'coupon': coupon
         }
-        return render(request,'admin/coupon_edit.html',context)
+        return render(request,'Admin/coupon_edit.html',context)
 
 def coupon_add(request):
     if request.method == 'POST':       
@@ -703,6 +707,6 @@ def coupon_add(request):
         coupon.save() 
         return redirect('coupon_list')
     else : 
-        return render(request,'admin/coupon_add.html')
+        return render(request,'Admin/coupon_add.html')
 
    

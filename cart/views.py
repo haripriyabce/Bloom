@@ -341,7 +341,7 @@ def pay_success(request):
     total = 0
     quantity = 0           
     print('in')  
-    uss = Users.objects.get(id=iddd) 
+    uss = Users.objects.get(id=request.session['user_id'] ) 
     carts = Cart.objects.get(user = uss)          
     cart_items = cartItem.objects.select_related('product').filter(cart = carts)            
     tot_di=0     
@@ -366,7 +366,7 @@ def pay_success(request):
         coup_discount=0            
     order_total = round(total-coup_discount)
     payment_method='RAZOR_PAY'
-    ship=Shipping_Address.objects.get(id=addid)                      
+    ship=Shipping_Address.objects.get(id=request.session['addid'])                      
     pay = Payment.objects.create(payment_method=payment_method,amount_paid=total,status="Completed")
     pay.save()
     order=Order.objects.create(payment_id=int(pay.id),address=ship,user=uss, order_total = order_total)
@@ -428,7 +428,7 @@ def cash_on_delivery(request):
         context = {
         'z':True,'logo_light':logo_light,
         }
-        return render(request,'Order/Place_order.html',context)  
+        return render(request,'Order/place_order.html',context)  
        
 
         
