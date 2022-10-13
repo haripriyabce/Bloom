@@ -146,14 +146,14 @@
 								aria-labelledby="panelsStayOpen-heading{{ x.id }}">
 								<div class="accordion-body">
 									<span  class="btn " data-bs-toggle="modal"
-										data-bs-target="#staticBackdrop{{ x.id }}">
+										data-bs-target="#sstaticBackdrop{{ x.id }}">
 										Edit
 									</span>
 									<a href="{% url 'remove_add' x.id %}" class="btn " >
 										Remove
 									</a>
 			
-									<div class="modal fade" id="staticBackdrop{{ x.id }}" data-bs-backdrop="static"
+									<div class="modal fade" id="sstaticBackdrop{{ x.id }}" data-bs-backdrop="static"
 										data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel"
 										aria-hidden="true">
 										<div class="modal-dialog">
