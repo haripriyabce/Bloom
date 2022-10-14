@@ -1,5 +1,6 @@
 import json
 import datetime
+from re import S
 import razorpay
 from google_currency import convert  
 from Blooms.settings import RAZORPAY_KEY_ID,RAZORPAY_KEY_SECRET
@@ -274,8 +275,8 @@ def checkt_pay(request):
         total*= am; 
         fl=float(total)
         total=round(fl, 2)
-        
-        return render(request,'Order/payment_select.html',{'total' : total,'tot_di':tot_di,'quantity' : quantity,'z':True,'logo_light':logo_light,'api_key':RAZORPAY_KEY_ID,'order_id':payment_order_id,'name':name,'email':email,'phno':phno,})         
+        phno=1234567898
+        return render(request,'Order/payment_select.html',{'total' : total,'tot_di':tot_di,'quantity' : quantity,'z':True,'logo_light':logo_light,'api_key':RAZORPAY_KEY_ID,'order_id':payment_order_id,'name':name,'email':email,'phno':phno,'usid':iddd,'aid':addid})         
 def show_addresses(request):    
     uss = Users.objects.get(id=request.session['user_id'])  
     addresses= Shipping_Address.objects.filter(user=uss,is_active=True,is_default=False)
@@ -290,7 +291,12 @@ def paypal_success(request):
     print('in')  
     uss = Users.objects.get(id=request.session['user_id']) 
     carts = Cart.objects.get(user = uss)          
-    cart_items = cartItem.objects.select_related('product').filter(cart = carts)            
+    cart_items = cartItem.objects.select_related('product').filter(cart = carts)       
+    for cart_item in cart_items:                 
+        prod=Product.objects.get(id=cart_item.product.id) 
+        s=prod.stock - quantity  
+        if s<0:
+            return redirect('cart')      
     tot_di=0     
     for cart_item in cart_items: 
         p=cart_item.product.price 
@@ -329,21 +335,30 @@ def paypal_success(request):
             di=pro_off.discount
             p=p-(p*di)/100  
         except Product_off.DoesNotExist:
-            pass             
+            pass                     
         order_item = Order_Product.objects.create(product=cart_item.product,discount=di,discount_price=p,quantity = cart_item.quantity,order = order,product_price=cart_item.product.price)
+        prod=Product.objects.get(id=cart_item.product) 
+        s=prod.stock - quantity
+        prod.stock = s
+        prod.save()
         order_item.save() 
     cart_items.delete() 
     carts.delete()  
     context = {'z':True,'logo_light':logo_light,}
     return render(request,'Order/pay_success.html',context)
 @csrf_exempt
-def pay_success(request):  
+def pay_success(request,id,aid):  
     total = 0
     quantity = 0           
     print('in')  
-    uss = Users.objects.get(id=request.session['user_id'] ) 
+    uss = Users.objects.get(id=id ) 
     carts = Cart.objects.get(user = uss)          
-    cart_items = cartItem.objects.select_related('product').filter(cart = carts)            
+    cart_items = cartItem.objects.select_related('product').filter(cart = carts)   
+    for cart_item in cart_items:                 
+        prod=Product.objects.get(id=cart_item.product.id) 
+        s=prod.stock - quantity  
+        if s<0:
+            return redirect('cart')                   
     tot_di=0     
     for cart_item in cart_items: 
         p=cart_item.product.price 
@@ -366,7 +381,7 @@ def pay_success(request):
         coup_discount=0            
     order_total = round(total-coup_discount)
     payment_method='RAZOR_PAY'
-    ship=Shipping_Address.objects.get(id=request.session['addid'])                      
+    ship=Shipping_Address.objects.get(id=aid)                      
     pay = Payment.objects.create(payment_method=payment_method,amount_paid=total,status="Completed")
     pay.save()
     order=Order.objects.create(payment_id=int(pay.id),address=ship,user=uss, order_total = order_total)
@@ -376,6 +391,10 @@ def pay_success(request):
     order.save()             
     for cart_item in cart_items:                 
         order_item = Order_Product.objects.create(product=cart_item.product,quantity = cart_item.quantity,order = order,product_price=cart_item.product.price)
+        prod=Product.objects.get(id=cart_item.product.id) 
+        s=prod.stock - quantity
+        prod.stock = s
+        prod.save()
         order_item.save() 
     cart_items.delete() 
     carts.delete()  
@@ -389,7 +408,12 @@ def cash_on_delivery(request):
         print('in') 
         uss = Users.objects.get(id=request.session['user_id']) 
         carts = Cart.objects.get(user = uss)          
-        cart_items = cartItem.objects.select_related('product').filter(cart = carts)            
+        cart_items = cartItem.objects.select_related('product').filter(cart = carts)        
+        for cart_item in cart_items:                 
+            prod=Product.objects.get(id=cart_item.product.id) 
+            s=prod.stock - quantity  
+            if s<0:
+                return redirect('cart')     
         tot_di=0     
         for cart_item in cart_items: 
             p=cart_item.product.price 
@@ -422,6 +446,10 @@ def cash_on_delivery(request):
         order.save()             
         for cart_item in cart_items:                 
             order_item = Order_Product.objects.create(product=cart_item.product,quantity = cart_item.quantity,order = order,product_price=cart_item.product.price)
+            prod=Product.objects.get(id=cart_item.product) 
+            s=prod.stock - quantity
+            prod.stock = s
+            prod.save()
             order_item.save() 
         cart_items.delete() 
         carts.delete()    

@@ -2,12 +2,6 @@
 
 {% load static %}
 {% block content %}
-
-
-    
-   
-
-
   <section class="ftco-section bg-light">
 	  <div class="container">
 		  <div class="row">
@@ -38,6 +32,14 @@
 											<!--<span class="mr-2 price-dc">{{x.product.price}}</span>-->
 											<span class="price-sale">₹ &nbsp{{x.product.price}}</span></p>
 									  </div>
+									  {% if x.product.stock < 1 %}
+									  <div class="rating">
+										<p class="text-right">
+											Out of Stock
+										</p>
+									</div>
+									  {% endif %}
+									 
 									  <!-- <div class="rating">
 										  <p class="text-right">
 											  <a href="#"><span class="ion-ios-star-outline"></span></a>

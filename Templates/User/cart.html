@@ -54,7 +54,7 @@
 					
 						<td class="product-name">
 							<h3>{{item.product.product_name}}</h3>
-							<p>Far far away, behind the word mountains, far from the countries</p>
+							<p>Stock: {{item.product.stock}}</p> 
 						</td>
 						
 						<td class="price">		
@@ -67,26 +67,52 @@
 						<input class="nodis_price" id="row-price{{item.id}}" value="{{item.product.price}}" type="hidden">
 							₹ &nbsp<span id="price{{item.id}}">{{item.product.price}}</span>
 						</td>
-						
+						{% if item.product.stock < 1 %}
 						<td class="quantity">
 							<div class="input-group mb-3">
-								<span class="input-group-btn mr-2">
-									<button type="button"  hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' hx-get="update_cart/{{ item.id }}" hx-include="[name='quantity{{ item.id }}']" hx-trigger="click" onclick="sub({{item.id}})" class="quantity-left-minus btn" data-type="minus"
-										data-field="">
-										<i class="ion-ios-remove"></i>
-									</button>
-								</span>
+								
 								<input class="idd" type="hidden"  value="{{item.id}}">
 								{% csrf_token %}
-								<input type="text" id="quantit{{item.id}}" name="quantity{{ item.id }}" class="form-control input-number" 	min="1" max="100" value="{{item.quantity}}">
-								<span class="input-group-btn ml-2">
-									<button type="button" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' hx-get="update_cart/{{ item.id }}" hx-include="[name='quantity{{ item.id }}']" hx-trigger="click"  onclick="add({{item.id}})" class="quantity-right-plus btn" data-type="plus">
-										<i class="ion-ios-add"></i>
-									</button>									
-								</span>
+								<input type="hidden" id="stock{{item.id}}" name="stock{{ item.id }}" class="form-control input-number" value="{{item.product.stock}}">
+								
+								<input type="hidden" id="quantit{{item.id}}" name="quantity{{ item.id }}" readonly class="form-control input-number" 	min="1" max="100" value="0">
+								
+								<p>
+									Out of Stock
+								</p>						
+								
+								<a href="#" id="{{ item.id }}" class="btn btn-primary button save_later">Save Later<a>
 						  </div>
 					  </td>
-						
+					  {% else %}
+					  <td class="quantity">
+						<div class="input-group mb-3">
+							<span class="input-group-btn mr-2">
+								<button type="button"  hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' hx-get="update_cart/{{ item.id }}" hx-include="[name='quantity{{ item.id }}']" hx-trigger="click" onclick="sub({{item.id}})" class="quantity-left-minus btn" data-type="minus"
+									data-field="">
+									<i class="ion-ios-remove"></i>
+								</button>
+
+
+								
+
+
+
+
+							</span>
+							<input class="idd" type="hidden"  value="{{item.id}}">
+							{% csrf_token %}
+							<input type="hidden" id="stock{{item.id}}" name="stock{{ item.id }}" class="form-control input-number" value="{{item.product.stock}}">
+							
+							<input type="text" id="quantit{{item.id}}" name="quantity{{ item.id }}" readonly class="form-control input-number" 	min="1" max="100" value="{{item.quantity}}">
+							<span class="input-group-btn ml-2">
+								<button type="button" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' hx-get="update_cart/{{ item.id }}" hx-include="[name='quantity{{ item.id }}']" hx-trigger="click"  onclick="add({{item.id}})" class="quantity-right-plus btn" data-type="plus">
+									<i class="ion-ios-add"></i>
+								</button>									
+							</span>
+					  </div>
+				  </td>
+					  {% endif %}
 						<td >
 							₹ &nbsp<span class="total" id="row-total{{item.id}}">{{ item.product.price|mul:item.quantity|floatformat:2}}</span>
 							<input type="hidden"  class="total_org" id="org_total{{item.id}}" >
@@ -139,29 +165,36 @@
 	
 	function add(id) {		
 		var val =  document.getElementById("quantit"+id).value;
-		val++;
+		var stock=document.getElementById("stock"+id).value;
+		
+		if(val < stock){
+			val++;
+			calc1(id,val)
+		 
+		 calc_total();
+		}	
+		else{
+			alert("product Out of Stock");
+		}	
+		
+		
+		
+	}
+	function calc1(id,val){
 		document.getElementById("quantit"+id).value=val;
+		
 		var s= val * document.getElementById("price"+id).innerHTML;
 		 document.getElementById("row-total"+id).innerHTML=s.toFixed(2);
 		 var s2= val * document.getElementById("row-price"+id).value;
 		 document.getElementById("org_total"+id).value=s2.toFixed(2);
 		 dis=s2-s
 		 document.getElementById("row_dis"+id).value=dis.toFixed(2);
-		 
-		 calc_total();
-		
 	}
 	function sub(id) {
 		var val = document.getElementById("quantit"+id).value;
 		if (val > 1) {
 			val--;
-			document.getElementById("quantit"+id).value = val;	
-			var s= val * document.getElementById("price"+id).innerHTML;		
-		 document.getElementById("row-total"+id).innerHTML=s.toFixed(2);
-		 var s2= val * document.getElementById("row-price"+id).value;
-		 document.getElementById("org_total"+id).value=s2.toFixed(2);
-		 dis=s2-s
-		 document.getElementById("row_dis"+id).value=dis.toFixed(2);
+			calc1(id,val)
 		  calc_total();	
 		}
 		}
@@ -181,6 +214,25 @@
 			
 			$('#cart-totall2').text(sum.toFixed(2));   			  
 		}
+		$(document).ready(function(){
+		$('#tablecart').on('click', '.save_later', function (e) {
+			e.preventDefault();
+			$(this).closest('tr').remove();
+			calc_total();	
+			
+			$.ajax({
+				url:'delete_cart_product/'+this.id,
+				method:'get',
+				  success:(response)=>{
+					  location.reload()			
+				  
+				}
+			  })
+			
+
+
+		});
+	});
 		$(document).ready(function(){
 			$(".status").each(function(){
 				id=$(this).val();

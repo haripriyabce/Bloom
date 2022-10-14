@@ -82,7 +82,7 @@ def login(request):
                 #                         )
 
                 # print(message.sid)       
-                messages.success(request,'OTP has been sent to '+user.Phone_number+' & enter OTP') 
+                messages.success(request,'OTP has been sent to '+ user.Phone_number +' & enter OTP') 
                 user_name = user
                 print(user_name)
                 context = { 
@@ -129,7 +129,7 @@ def login_otp(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)  
 def register1(request):
     if 'username' in request.session:
-        return render(request,'home.html')        
+        return render(request,'index.html')        
     if request.method == 'POST':
         first_name = request.POST['first_name']
         last_name = request.POST['last_name']   
@@ -165,7 +165,7 @@ def register1(request):
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)  
 def register(request):
     if 'username' in request.session:
-        return render(request,'home.html')        
+        return render(request,'index.html')        
     if request.method == 'POST':
         first_name = request.POST['first_name']
         last_name = request.POST['last_name']   
@@ -279,7 +279,7 @@ def products(request,cat=None,sub=None):
    
     page = request.GET.get('page', 1)
 
-    paginator = Paginator(products, 2)
+    paginator = Paginator(products, 3)
     
     try:
         prods = paginator.page(page)

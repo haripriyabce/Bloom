@@ -368,47 +368,35 @@ def orders(request):
     page_obj = paginator.get_page(page_number)
     return render( request,'Admin/order_list.html',{'page_obj':page_obj})
 def rep_orders(request): 
-    orders=Order.objects.select_related('address').select_related('payment').order_by('-id')   
+    orders=Order.objects.select_related('address').select_related('payment').filter(status='Delivered').order_by('-id')   
     if request.method=='POST':        
         search = request.POST.get('search')
         from_date = request.POST.get('from_date')
         to_date = request.POST.get('to_date') 
-        print('from_date',from_date)
-        print('to_date',to_date)
         from_date = datetime.datetime.strptime(from_date, '%Y-%m-%d')
         to_date = datetime.datetime.strptime(to_date, '%Y-%m-%d') 
-        print('from_date',from_date)
-        print('to_date',to_date)
-        # print("sxsfxf",request.POST.items())
         year = request.POST.get('yearly')
         month = request.POST.get('monthly')  
-        if from_date !=None and to_date!=None and search !='':
-            searchwith=Q(Q(address__first_name__icontains=search)|Q(address__email__icontains=search)|Q(address__last_name__icontains=search)|Q(payment__payment_method__icontains = search))
-            #myuser =User.objects.filter(searchwith).values()       
-       
-            orders = orders.filter(created_at__date__range=[from_date, to_date]).filter(searchwith)
-        if search !='':
-            searchwith=Q(Q(address__first_name__icontains=search)|Q(address__email__icontains=search)|Q(address__last_name__icontains=search)|Q(payment__payment_method__icontains = search))
-       
-            orders = orders.filter(searchwith)
         if from_date !='' and to_date!='':            
-            orders = Order.objects.filter(created_at__date__range=[from_date, to_date]) 
+            orders = orders.filter(created_at__date__range=[from_date, to_date]) 
+            if search !='':
+                searchwith=Q(Q(address__first_name__icontains=search)|Q(address__email__icontains=search)|Q(address__last_name__icontains=search)|Q(payment__payment_method__icontains = search))
+                orders = orders.filter(searchwith)
+        if search !='':
+                searchwith=Q(Q(address__first_name__icontains=search)|Q(address__email__icontains=search)|Q(address__last_name__icontains=search)|Q(payment__payment_method__icontains = search))
+                orders = orders.filter(searchwith) 
         if  year !='': 
-            orders = Order.objects.filter(created_at__year__gte=year,created_at__year__lte=year) 
+            orders = orders.filter(created_at__year__gte=year,created_at__year__lte=year) 
         if  month !='':      
             datetime_object = datetime.datetime.strptime(month, "%B")
             month = datetime_object.month
-            orders = Order.objects.filter(created_at__month__gte=month,created_at__month__lte=month)
+            orders = orders.filter(created_at__month__gte=month,created_at__month__lte=month)
     agg_orders=orders.aggregate(Total=Sum('order_total'),count=Count('id'))  
-    print('agg_ordersffffff',agg_orders,'agg_ordersggggg') 
-    print('aag',agg_orders['Total'])
-    #orders=Order.objects.select_related('address').select_related('payment').order_by('-id')    
     paginator = Paginator(orders, 10) 
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     mon=list(calendar.month_name)
-    e=range(2011,2023)
-    
+    e=range(2011,2023)    
     return render( request,'Admin/orders_report.html',{'page_obj':page_obj,'e':e,'mon':mon,'agg_orders':agg_orders})       
 def rep_orders_yearly(request): 
     orders=Order.objects.select_related('address').select_related('payment').order_by('-id')   
@@ -588,7 +576,7 @@ def export_csv(request):
         writer.writerow([order.order_number , order.first_name , order.order_total  , order.created_at ])
     return response
 
-def export_excel(request):
+def export_excel(request,orders):
     response = HttpResponse(content_type = 'application/ms-excel')
     response['Content-Disposition'] = 'attachement; filename=SalesReport' +str(datetime.datetime.now())+'.xls'
     wb = xlwt.Workbook(encoding = 'utf-8')

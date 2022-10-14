@@ -37,8 +37,8 @@
 
             <form action="" method="post">
               {% csrf_token %}
-             <input class="form-control" type="date" id="from_date" name="from_date" onchange= "isFutureDate(this.value)">
-              <input class="form-control" type="date" id="to_date" name="to_date" onchange= "isPrevious(this.value)" >
+             <input class="form-control" type="date" id="from_date" name="from_date" >
+              <input class="form-control" type="date" id="to_date" name="to_date"  >
              <input class="form-control" type="text" id="search" placeholder="Search" name="search" >
               
               <select name="yearly" id="yearly" onchange="calc_year(this.value)">

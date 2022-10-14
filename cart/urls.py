@@ -9,7 +9,7 @@ urlpatterns = [
     path('checkt_add', views.checkt_add,name='checkt_add'),
     path('paypal_success', views.paypal_success,name='paypal_success'),
     path('checkt_pay', views.checkt_pay,name='checkt_pay'),
-    path('pay_success', views.pay_success,name='pay_success'),
+    path('pay_success/<int:id>/<int:aid>', views.pay_success,name='pay_success'),
     path('cash_on_delivery', views.cash_on_delivery,name='cash_on_delivery'),    
     path('show_addresses/',views.show_addresses,name='show_addresses'),
     

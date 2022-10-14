@@ -32,7 +32,7 @@
 								<div class="form-group">
 									<div class="col-md-12">
 
-										<form action="{% url 'pay_success'%}" method="POST">
+										<form action="{% url 'pay_success' usid aid %}" method="POST">
 											{% csrf_token %} 
 											
 								 	<script
