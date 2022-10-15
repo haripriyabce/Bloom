@@ -66,8 +66,6 @@ def login(request):
             user = Users.objects.get(username=email, password=password)            
             if user is not None:
                 auth.login(request,user) 
-                                  
-                
                 otp = str(random.randint(1000,9999))
                 print(otp) 
                 request.session['otp'] =otp

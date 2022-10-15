@@ -14,10 +14,12 @@
                 
                </div>
               {% endfor %}  
+              <a  href="{% url 'index1' %}">
               <div class="col-md-12 text-center p-5" style="padding:auto ;!important">
-                <img src="{% static 'images/imag/logoo.png' %}" class="img-fluid" height="100px" width="150px">
+                <img src="{% static 'ims/' %}{{logo_light.image}}" class="img-fluid" height="100px" width="150px">
                   <!-- <img src="{% static 'ims/' %}{{x.image1}}">-->
               </div>
+            </a>
             {% csrf_token %}
             <div class="form-group">
               <input type="text" class="form-control" name="first_name" placeholder="Your First Name">
