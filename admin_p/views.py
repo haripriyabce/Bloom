@@ -12,6 +12,7 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.template import loader
+from content.models import Content
 from admin_p.models import Users,Shipping_Address
 from order.models import Order,Order_Product, Payment,Product_off,Category_off
 from category.models import Category,Subcategory
@@ -24,6 +25,7 @@ from django.template.loader import render_to_string
 from cart.models import Coupon
 import xlwt
 from weasyprint import HTML
+logo_dark= Content.objects.get(name='logo_dark')
 # Create your views here.
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def login(request):    
@@ -56,6 +58,7 @@ def home(request):
        
         top_products=Product.objects.annotate(quantity_sum=Sum('order_product__quantity')).filter(quantity_sum__gt=0).order_by('-quantity_sum')[:5]
         print(top_products)
+        print("dddddddddddddkkkkkkkkkk",logo_dark)
         template = loader.get_template('Admin/admin_home.html')
         context = {  
         'order_count':order_count,
@@ -65,7 +68,8 @@ def home(request):
         'recent_order':recent_order, 
         'top_products' :top_products,
         'payment_method_count':payment_method_count,  
-        'order_status_count':order_status_count   
+        'order_status_count':order_status_count  ,
+        'logo_dark':logo_dark, 
         }
         return HttpResponse(template.render(context, request))
     return redirect(login)
