@@ -89,7 +89,13 @@
                     <small class="mb-0 text-muted"></small>
                   </td>
                   <td>
-                  0.00
+                 
+					{% for y in pro_off %}									
+					{% if y.product_id == x.product.id %} 
+					
+					<p>{{y.discount}}%</p>
+					{% endif %}
+								 {% endfor %}
                   </td>
                   <td>
                     {{ x.product_price|mul:x.quantity|floatformat:2}}

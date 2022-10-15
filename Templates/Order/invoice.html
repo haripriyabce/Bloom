@@ -177,7 +177,14 @@
                 <td> {{orderproduct.product.product_name}}</td>
                 <td>{{orderproduct.quantity}}</td>
                 <td>{{orderproduct.product.price}}</td>
-                <td>0.00</td>
+                <td>
+					{% for y in pro_off %}									
+					{% if y.product_id == orderproduct.product.id %} 
+					
+					<h3>{{y.discount}}%</h3>
+					{% endif %}
+								 {% endfor %}
+                                </td>
                 <td>{{orderproduct.product.price|mul:orderproduct.quantity }}</td>
                 <td>{{orderproduct.product.price|mul:orderproduct.quantity }}</td>
 
@@ -207,9 +214,9 @@
 
                 <th>₹{{total}}</th>
             </tr>
-            <tr>
+         <!--  <tr>
                 <th colspan="3" class="text-right text-muted">Amount in Words:</th> <th colspan="4" class="text-right text-muted">x</th>
-            </tr>
+            </tr>-->
            
             <tr style="height:100px">
                 <td colspan="7" class="text-right text-bottom"> &nbsp</td>

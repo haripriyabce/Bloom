@@ -2,7 +2,7 @@ from ast import For
 from django.shortcuts import render,redirect
 from content.models import Content
 from django.contrib import messages
-from order.models import Order, Order_Product
+from order.models import Order, Order_Product,Product_off
 from admin_p.models import Users,Shipping_Address
 from .models import Wishlist,WishlistItem
 from product.models import Product
@@ -93,16 +93,17 @@ def myorders(request):
     return render( request,'Profile/my_orders.html',{'orders':orders,'logo_light':logo_light})
 def myorders_de(request,id):
     order=Order.objects.select_related('address').select_related('payment').get(id=id)
-    orderitems=Order_Product.objects.select_related('product').filter(order_id=id)       
-    return render( request,'Profile/Order_details.html',{'order':order,'orderitems':orderitems,'logo_light':logo_light}) 
+    orderitems=Order_Product.objects.select_related('product').filter(order_id=id)  
+    pro_off=Product_off.objects.all()     
+    return render( request,'Profile/Order_details.html',{'order':order,'orderitems':orderitems,'logo_light':logo_light,'pro_off':pro_off}) 
 
 def invoice(request,id):
     order=Order.objects.select_related('address').select_related('payment').get(id=id)
     total = order.order_total
     order_product=Order_Product.objects.select_related('product').filter(order_id=id)      
     
-        
-    context ={'order':order,'order_product':order_product,'total':total,'logo_light':logo_light}
+    pro_off=Product_off.objects.all()    
+    context ={'order':order,'order_product':order_product,'total':total,'logo_light':logo_light,'pro_off':pro_off}
     return render(request,'Order/invoice.html',context) 
 def track_order(request,id):
     order=Order.objects.select_related('address').select_related('payment').get(id=id)

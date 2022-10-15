@@ -27,10 +27,10 @@
 				<th>Discount</th>
 				<th style='width:20%;'>Total</th>
 				<th style='width:20%;'>Discount Total</th>
-				{% if order.status == 'Delivered' %}
+				{% comment %} {% if order.status == 'Delivered' %}
 
 				<th>Action</th>
-				{% endif %}
+				{% endif %} {% endcomment %}
 			</tr>
 		</thead>
 		<tbody>
@@ -55,7 +55,14 @@
 					<h3>{{x.quantity}}</h3>
 				</td>
 				<td class="product-name">
-					<h3>{{x.discount}}%</h3>
+
+					{% for y in pro_off %}									
+					{% if y.product_id == x.product.id %} 
+					
+					<h3>{{y.discount}}%</h3>
+					{% endif %}
+								 {% endfor %}
+										
 
 				</td>
 				<td class="product-name">
@@ -64,12 +71,12 @@
 				<td class="product-name">
 					<h3> {{ x.discount_price|mul:x.quantity|floatformat:2}}</h3>
 				</td>
-				{% if order.status == 'Delivered' %}
+				{% comment %} {% if order.status == 'Delivered' %}
 				<td>
 					<h3> <a href="{% url 'review' x.product.id %}" class="btn btn-primary">Review </a></h3>
 
 				</td>
-				{% endif %}
+				{% endif %} {% endcomment %}
 
 			</tr>
 

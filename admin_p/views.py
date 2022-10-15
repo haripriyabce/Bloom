@@ -419,8 +419,9 @@ def rep_orders_yearly(request):
     #return render( request,'Admin/orders_report.html',{'page_obj':page_obj,'e':e,'mon':mon})           
 def orders_de(request,id):
     order=Order.objects.select_related('address').select_related('payment').get(id=id)
-    orderitems=Order_Product.objects.select_related('product').filter(order_id=id)       
-    return render( request,'Admin/orderitem_list.html',{'order':order,'orderitems':orderitems}) 
+    orderitems=Order_Product.objects.select_related('product').filter(order_id=id)  
+    pro_off=Product_off.objects.all()      
+    return render( request,'Admin/orderitem_list.html',{'order':order,'orderitems':orderitems,'pro_off':pro_off}) 
 def cancel_order(request,id):     
     myorder =Order.objects.get(id__exact=id)    
     myorder.status = 'Cancelled'
