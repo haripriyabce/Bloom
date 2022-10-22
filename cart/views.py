@@ -337,7 +337,7 @@ def paypal_success(request):
         except Product_off.DoesNotExist:
             pass                     
         order_item = Order_Product.objects.create(product=cart_item.product,discount=di,discount_price=p,quantity = cart_item.quantity,order = order,product_price=cart_item.product.price)
-        prod=Product.objects.get(id=cart_item.product) 
+        prod=Product.objects.get(id=cart_item.product.id) 
         s=prod.stock - quantity
         prod.stock = s
         prod.save()
@@ -446,7 +446,7 @@ def cash_on_delivery(request):
         order.save()             
         for cart_item in cart_items:                 
             order_item = Order_Product.objects.create(product=cart_item.product,quantity = cart_item.quantity,order = order,product_price=cart_item.product.price)
-            prod=Product.objects.get(id=cart_item.product) 
+            prod=Product.objects.get(id=cart_item.product.id) 
             s=prod.stock - quantity
             prod.stock = s
             prod.save()

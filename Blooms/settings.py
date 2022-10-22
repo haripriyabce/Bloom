@@ -108,6 +108,7 @@ DATABASES = {
         'HOST':'database.c4bubdkleydj.ap-northeast-1.rds.amazonaws.com',
         'PORT': '5432',
     }
+    
 }
 # else:
 #     DATABASES = {

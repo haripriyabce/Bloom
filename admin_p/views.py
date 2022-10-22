@@ -427,6 +427,7 @@ def cancel_order(request,id):
     myorder.status = 'Cancelled'
     myorder.save()
     return HttpResponse("Cancelled")
+
 def complete_order(request,id):     
     myorder =Order.objects.get(id__exact=id)    
     myorder.status = 'Delivered'

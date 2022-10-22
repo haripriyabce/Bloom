@@ -13,6 +13,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate
 from django.contrib import messages,auth
 from django.core.paginator import Paginator
+import datetime
 # Create your views here.
 logo_light= Content.objects.get(name='logo_light')
 def index1(request):
@@ -22,6 +23,8 @@ def index1(request):
         if 'username' in request.session:            
             print(request.session['user_id'])   
             z=True    
+    now = datetime.datetime.now()
+    print("nnnnnnnnoooooooooooowwwwwwwww",now)
     products= Product.objects.all()[2:5]
     logo_light= Content.objects.get(name='logo_light')
     slider= Content.objects.filter(name='slider')    
